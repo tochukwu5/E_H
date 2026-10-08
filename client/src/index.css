@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Palette: cool paper + dispatch blue in light; deep navy (not black) in dark. Match green is reserved for scores. */
+:root {
+  --canvas: 243 245 249;
+  --surface: 255 255 255;
+  --raised: 248 249 252;
+  --ink: 23 33 58;
+  --muted: 84 96 126;
+  --faint: 132 143 168;
+  --line: 225 230 239;
+  --brand: 39 71 214;
+  --brand-soft: 232 237 255;
+  --brand-ink: 255 255 255;
+  --match: 15 143 107;
+  --match-soft: 223 245 237;
+  --warn: 176 118 0;
+  --warn-soft: 253 243 219;
+  --danger: 200 54 74;
+  --danger-soft: 252 231 234;
+  --shadow: 23 33 58;
+  color-scheme: light;
+}
+
+.dark {
+  --canvas: 15 22 41;
+  --surface: 22 32 54;
+  --raised: 28 40 66;
+  --ink: 231 236 247;
+  --muted: 160 172 200;
+  --faint: 116 129 160;
+  --line: 40 53 82;
+  --brand: 125 149 255;
+  --brand-soft: 34 47 90;
+  --brand-ink: 12 18 38;
+  --match: 54 207 160;
+  --match-soft: 20 55 55;
+  --warn: 240 184 64;
+  --warn-soft: 58 48 26;
+  --danger: 255 120 138;
+  --danger-soft: 66 30 42;
+  --shadow: 0 0 0;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+    font-size: 16px;
+    line-height: 1.55;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display text-ink;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+  }
+  ::selection {
+    background: rgb(var(--brand) / 0.22);
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--brand));
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  .page {
+    @apply mx-auto w-full max-w-page px-4 sm:px-6;
+  }
+  .panel {
+    @apply rounded-panel border border-line bg-surface;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-semibold text-ink;
+  }
+  .hint {
+    @apply mt-1.5 text-[13px] text-muted;
+  }
+  .input {
+    @apply w-full rounded-ctl border border-line bg-surface px-3.5 py-2.5 text-[15px] text-ink placeholder:text-faint transition-colors focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/15;
+  }
+  .prose-job {
+    @apply text-[15px] leading-7 text-ink/90;
+    white-space: pre-line;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* The one orchestrated moment: alerts arriving in the hero thread. */
+@keyframes arrive {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+.arrive {
+  opacity: 0;
+  animation: arrive 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.live-dot {
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
