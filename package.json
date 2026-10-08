@@ -1,9 +1,11 @@
 {
   "name": "employhunt",
   "private": true,
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "npm --prefix client install --include=dev && npm --prefix client run build && npm --prefix server install --omit=dev",
-    "start": "npm --prefix server start"
+    "start": "node api.js && npm --prefix server start"
   }
 }
