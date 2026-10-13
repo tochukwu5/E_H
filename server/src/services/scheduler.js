@@ -5,6 +5,7 @@ import { runFetch } from './fetcher.js';
 import { sendDigests, notifyUser } from './notifier.js';
 import Application from '../models/Application.js';
 import User from '../models/User.js';
+  import { runCleanup } from './cleanup.js';
 
 async function followUps() {
   const due = await Application.find({ status: 'applied', followUpSent: false, followUpAt: { $lte: new Date() } }).limit(500);
@@ -40,6 +41,8 @@ export function startScheduler() {
   cron.schedule('5 * * * *', safe('digest', sendDigests));
   cron.schedule('20 */3 * * *', safe('followups', followUps));
   cron.schedule('0 3 * * *', safe('plans', expirePlans));
+      cron.schedule('30 3 * * *', safe('cleanup', runCleanup)); // nightly, keeps the database small
+    setTimeout(safe('cleanup-boot', runCleanup), 20_000); // also once shortly after every start/deploy
   logger.info(`[cron] scheduler started (fetch: "${env.fetchCron}")`);
   // First fetch shortly after boot so a fresh install has jobs to show.
   setTimeout(safe('fetch-boot', () => runFetch()), 10_000);

@@ -29,7 +29,10 @@ async function trackedKeywords() {
 /** Upsert normalized jobs; returns ids of jobs we had never seen before. */
 export async function saveJobs(jobs) {
   if (!jobs.length) return { inserted: [], updated: 0 };
-  const valid = jobs.filter((j) => j.url && j.title);
+     // Skip postings older than JOB_MAX_AGE_DAYS: they're stale, and the nightly cleanup would only delete them again.
+    const oldest = Date.now() - env.jobMaxAgeDays * 864e5;
+    const valid = jobs.filter((j) => j.url && j.title && (!j.postedAt || new Date(j.postedAt).getTime() >= oldest));
+    if (!valid.length) return { inserted: [], updated: 0 };
   const ops = valid.map((j) => {
     const { slug, ...rest } = j;
     return { updateOne: { filter: { externalKey: j.externalKey }, update: { $set: rest, $setOnInsert: { slug, firstSeenAt: new Date() } }, upsert: true } };
@@ -120,8 +123,8 @@ export async function runFetch({ only } = {}) {
       const r = s.group === 'ats' ? await fetchAtsSource(s) : await fetchFeedSource(s, ctx);
       newIds.push(...(r?.newIds || []));
     }
-    // Jobs not seen for 10 days are treated as closed.
-    await Job.updateMany({ active: true, lastSeenAt: { $lt: new Date(Date.now() - 10 * 864e5) } }, { $set: { active: false } });
+    // Jobs not seen at their source for 7 days are treated as closed (the nightly cleanup deletes them).
+    await Job.updateMany({ active: true, lastSeenAt: { $lt: new Date(Date.now() - 7 * 864e5) } }, { $set: { active: false } });
     logger.info(`[fetch] done in ${((Date.now() - t0) / 1000).toFixed(1)}s, ${newIds.length} new jobs`);
     if (newIds.length) await processNewJobs(newIds);
     return { newJobs: newIds.length, seconds: (Date.now() - t0) / 1000 };

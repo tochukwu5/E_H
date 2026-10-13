@@ -15,6 +15,7 @@ export const env = {
   adminPassword: process.env.ADMIN_PASSWORD,
 
   fetchCron: process.env.FETCH_CRON || '*/15 * * * *',
+  jobMaxAgeDays: Number(process.env.JOB_MAX_AGE_DAYS || 30),
   runScheduler: bool(process.env.RUN_SCHEDULER, true),
   contactEmail: process.env.CONTACT_EMAIL || 'hello@employhunt.app',
   defaultKeywords: list(process.env.DEFAULT_KEYWORDS, ['developer', 'engineer', 'designer', 'marketing']),

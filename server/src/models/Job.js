@@ -50,7 +50,8 @@ const JobSchema = new Schema(
   { timestamps: true }
 );
 
-JobSchema.index({ title: 'text', company: 'text', tags: 'text', description: 'text' }, { weights: { title: 10, company: 5, tags: 4, description: 1 } });
+// Search index on short fields only. Indexing full descriptions made the index larger than the data itself.
+JobSchema.index({ title: 'text', company: 'text', tags: 'text', skills: 'text' }, { name: 'job_search', weights: { title: 10, company: 5, skills: 4, tags: 3 } });
 JobSchema.index({ active: 1, isDuplicate: 1, postedAt: -1 });
 
 export default mongoose.model('Job', JobSchema);
