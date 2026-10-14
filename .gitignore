@@ -4,3 +4,5 @@ server/uploads/
 .DS_Store
 *.log
 config.bat
+server/.env
+.env

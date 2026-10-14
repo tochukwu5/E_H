@@ -12,13 +12,9 @@ import { timeAgo } from '../lib/format';
 
 export function Logo({ className }) {
   return (
-    <Link to="/" className={clsx('flex items-center gap-2 font-display text-[19px] font-bold tracking-tight text-ink', className)} aria-label="EmployHunt home">
-      <svg viewBox="0 0 32 32" className="h-8 w-8" aria-hidden>
-        <rect width="32" height="32" rx="9" className="fill-brand" />
-        <path d="M9 10.5h11M9 16h8M9 21.5h11" stroke="white" strokeWidth="2.6" strokeLinecap="round" />
-        <circle cx="23.5" cy="16" r="3" className="fill-match" />
-      </svg>
-      EmployHunt
+    <Link to="/" className={clsx('flex items-center gap-0 font-display text-[19px] font-bold tracking-tight text-ink', className)} aria-label="EmployHunt home">
+      <img src="/favicon.svg" alt="" className="h-8 w-8 object-contain mr-2" />
+      Employ<span className="text-blue-500 p-0 m-0">Hunt</span> 
     </Link>
   );
 }

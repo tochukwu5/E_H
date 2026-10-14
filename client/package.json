@@ -3,11 +3,11 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "node api.js && vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
+    "scripts": {
+     "dev": "vite",
+     "build": "vite build",
+     "preview": "vite preview"
+   },
   "dependencies": {
     "@tanstack/react-query": "^5.64.2",
     "axios": "^1.7.9",
