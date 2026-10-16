@@ -1,8 +1,8 @@
 node_modules/
 dist/
-server/uploads/
-.DS_Store
-*.log
-config.bat
-server/.env
 .env
+server/.env
+server/uploads/
+.vscode/
+*.log
+.DS_Store
