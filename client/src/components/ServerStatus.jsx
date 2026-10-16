@@ -7,7 +7,7 @@ export default function ServerStatus() {
   if (!isError) return null;
   return (
     <div role="alert" className="bg-danger px-4 py-2.5 text-center text-[14px] font-semibold text-white">
-      Can't reach the EmployHunt server. Make sure the backend is running (npm run dev in the server folder).
+      Can't reach the EmployHunt server. Make sure the backend is running...
     </div>
   );
 }
