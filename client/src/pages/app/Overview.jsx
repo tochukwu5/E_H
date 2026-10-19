@@ -42,7 +42,7 @@ export default function Overview() {
   const checklist = [
     ['Upload your resume', Boolean(user.profile?.resume?.fileName), '/app/settings/profile'],
     ['Add a job search', user.searches?.length > 0, '/app/searches'],
-    ['Connect Telegram or WhatsApp', Boolean(user.alerts?.telegram?.chatId || user.alerts?.whatsapp?.optIn), '/app/settings/alerts'],
+    ['Connect Telegram (WhatsApp coming soon)', Boolean(user.alerts?.telegram?.chatId || user.alerts?.whatsapp?.optIn), '/app/settings/alerts'],
     ['Save your screening answers', Boolean(user.apply?.answers?.workAuthorization || user.apply?.answers?.noticePeriod), '/app/settings/apply'],
   ];
   const done = checklist.filter((c) => c[1]).length;

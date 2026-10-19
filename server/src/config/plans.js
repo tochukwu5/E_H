@@ -37,7 +37,7 @@ export const PLANS = {
       autoApplyPerMonth: 0,
       companyWatchlist: 10,
     },
-    features: ['3 job searches', 'Instant alerts on WhatsApp and Telegram', 'AI match reasons', '30 AI cover letters a month', 'Watch 10 companies'],
+    features: ['3 job searches', 'Instant alerts on Telegram (WhatsApp coming soon)', 'AI match reasons', '30 AI cover letters a month', 'Watch 10 companies'],
   },
   pro: {
     id: 'pro',

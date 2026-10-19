@@ -137,22 +137,12 @@ function AlertsTab() {
             </>
           ) : link ? <Button size="sm" variant="secondary" onClick={checkTg}>I've tapped Start</Button> : <Button size="sm" onClick={connectTg}>Connect Telegram</Button>}
         </div>
-
-        <div className="rounded-ctl border border-line p-4">
-          <div className="flex flex-wrap items-center gap-4">
-            <MessageCircle className="h-5 w-5 text-match" />
-            <div className="flex-1">
-              <div className="text-[15px] font-semibold">WhatsApp {!paid && <Locked>Basic plan and up</Locked>}</div>
-              <div className="text-[13px] text-muted">Include your country code, for example +234 801 234 5678.</div>
-            </div>
-            {a.whatsapp.optIn && <Toggle checked={a.whatsapp.enabled} onChange={(v) => save.mutate({ whatsapp: { enabled: v } })} label="" disabled={!paid} />}
+        <div className="flex flex-wrap items-center gap-4 rounded-ctl border border-line p-4 opacity-70">
+          <MessageCircle className="h-5 w-5 text-match" />
+          <div className="flex-1">
+            <div className="text-[15px] font-semibold">WhatsApp <span className="ml-1 rounded-full bg-brand/10 px-2 py-0.5 text-[12px] font-semibold text-brand">Coming soon</span></div>
+            <div className="text-[13px] text-muted">WhatsApp alerts are on the way. Use Telegram or email for now.</div>
           </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+234…" className="max-w-xs" disabled={!paid} />
-            <Button variant="secondary" disabled={!paid || !phone} onClick={() => save.mutate({ whatsapp: { phone, optIn: true, enabled: true } })}>{a.whatsapp.optIn ? 'Update number' : 'Turn on WhatsApp'}</Button>
-            {a.whatsapp.optIn && <Button variant="ghost" onClick={() => test.mutate('whatsapp')}>Send test</Button>}
-          </div>
-          {paid && !a.whatsapp.optIn && <p className="hint">By turning this on you agree to receive job alerts from EmployHunt on WhatsApp. Reply STOP any time.</p>}
         </div>
 
         <div className="flex flex-wrap items-center gap-4 rounded-ctl border border-line p-4">

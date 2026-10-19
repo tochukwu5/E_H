@@ -243,7 +243,7 @@ function SideNav({ onNavigate }) {
         <Link to="/app/settings/billing" onClick={onNavigate} className="mt-auto rounded-panel border border-line bg-raised p-4">
           <Sparkles className="h-5 w-5 text-brand" />
           <div className="mt-2 text-[14px] font-semibold">Get alerts instantly</div>
-          <div className="mt-0.5 text-[13px] text-muted">Basic sends matches to WhatsApp and Telegram the minute we find them.</div>
+          <div className="mt-0.5 text-[13px] text-muted">Basic sends matches to Telegram the minute we find them. WhatsApp is coming soon.</div>
           <div className="mt-2 text-[13px] font-semibold text-brand">See plans</div>
         </Link>
       )}

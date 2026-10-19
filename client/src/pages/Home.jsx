@@ -46,7 +46,7 @@ function Hero() {
         )}
         <h1 className="max-w-[14ch] text-[44px] font-bold leading-[1.02] sm:text-[60px] lg:text-[68px]">Hear about the job before the crowd does.</h1>
         <p className="mt-6 max-w-[54ch] text-[18px] leading-8 text-muted">
-          EmployHunt checks company career pages and trusted job boards every few minutes, scores each new job against your resume, and sends the good ones to WhatsApp or Telegram. On Pro, it drafts your application too.
+          EmployHunt checks company career pages and trusted job boards every few minutes, scores each new job against your resume, and sends the good ones to Telegram or email, with WhatsApp coming soon. On Pro, it drafts your application too.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Button to="/register" size="lg">Start free</Button>
@@ -231,7 +231,7 @@ const CONTROLS = [
   [SlidersHorizontal, 'Match strictness', 'Per search, from "show me more" to "only near-perfect".'],
   [Moon, 'Quiet hours', 'No alerts while you sleep. They wait for the morning digest.'],
   [BellRing, 'Instant or daily digest', 'Pick per channel. Cap how many alerts you get a day.'],
-  [MessageCircle, 'WhatsApp, Telegram or email', 'Use one, or all three.'],
+  [MessageCircle, 'Telegram or email', 'Use one or both. WhatsApp is coming soon.'],
   [Ban, 'Block companies and words', 'Never see a company again, or anything that says "unpaid".'],
   [Eye, 'Company watchlist', 'Always hear when a company you love posts anything.'],
   [Globe2, 'Country eligibility', 'Only jobs open to where you live.'],

@@ -12,7 +12,7 @@ const ROWS = [
   ['Active job searches', (l) => l.niches],
   ['Alert speed', (l) => (l.delivery === 'instant' ? 'Within minutes' : 'Daily digest')],
   ['Telegram and email', () => true],
-  ['WhatsApp', (l) => l.channels.includes('whatsapp')],
+ ['WhatsApp', (l) => (l.channels.includes('whatsapp') ? 'Coming soon' : false)],
   ['Alerts per day', (l) => l.maxAlertsPerDay],
   ['AI match reasons', (l) => l.aiMatchReasons],
   ['AI cover letters per month', (l) => l.coverLetters],

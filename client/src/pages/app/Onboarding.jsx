@@ -199,8 +199,8 @@ function AlertsStep({ back }) {
         <div className="panel flex items-center gap-4 p-5">
           <span className="grid h-11 w-11 place-items-center rounded-full bg-match-soft text-match"><MessageCircle className="h-5 w-5" /></span>
           <div className="flex-1">
-            <div className="text-[15px] font-semibold">WhatsApp</div>
-            <div className="text-[13px] text-muted">Available from the Basic plan. Add your number in Settings after upgrading.</div>
+                      <div className="text-[15px] font-semibold">WhatsApp <span className="ml-1 rounded-full bg-brand/10 px-2 py-0.5 text-[12px] font-semibold text-brand">Coming soon</span></div>
+            <div className="text-[13px] text-muted">WhatsApp alerts are on the way. Use Telegram or email for now.</div>
           </div>
         </div>
         <div className="panel p-5"><Toggle checked={email} onChange={setEmail} label={<span className="inline-flex items-center gap-2"><Mail className="h-4 w-4 text-muted" />Email digest</span>} description={`A daily summary sent to ${user.email}`} /></div>

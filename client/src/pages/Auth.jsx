@@ -122,7 +122,7 @@ export default function Auth({ mode }) {
             'Ready-made searches like "Remote React developer" you can edit',
             'Matches from the last 7 days waiting for you the moment you finish',
             'A free ATS check on any job you open',
-            'Alerts on Telegram or email (WhatsApp from Basic)',
+            'Alerts on Telegram or email (WhatsApp coming soon)',
           ].map((t) => (
             <li key={t} className="flex gap-3"><Check className="mt-0.5 h-5 w-5 shrink-0 text-match" />{t}</li>
           ))}
