@@ -8,6 +8,7 @@ import { validate } from '../middleware/validate.js';
 import { requireAuth, signToken, setAuthCookie, clearAuthCookie } from '../middleware/auth.js';
 import { sendEmail, layout } from '../channels/email.js';
 import { env } from '../config/env.js';
+import { logger } from '../utils/logger.js';
 
 const r = Router();
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 30, standardHeaders: true, legacyHeaders: false, message: { message: 'Too many attempts. Wait a few minutes and try again.' } });
@@ -86,12 +87,13 @@ r.post(
       user.resetExpires = new Date(Date.now() + 60 * 60 * 1000);
       await user.save();
       const link = `${env.siteUrl}/reset-password?token=${raw}`;
-      await sendEmail({
+      // Don't make the user wait for the email provider, and never fail the request because of it.
+      sendEmail({
         to: user.email,
         subject: 'Reset your EmployHunt password',
         html: layout('Reset your password', `<p>Tap the button to choose a new password. The link works for one hour.</p><p><a href="${link}" style="background:#2747d6;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600">Choose a new password</a></p><p style="font-size:13px;color:#6b7690">Didn't ask for this? You can ignore this email.</p>`),
         text: `Reset your password: ${link}`,
-      });
+      }).catch((e) => logger.error(`[email] password reset to ${user.email} failed: ${e.message}`));
     }
     // Same answer either way so nobody can test which emails have accounts.
     res.json({ ok: true, message: 'If that email has an account, a reset link is on its way.' });

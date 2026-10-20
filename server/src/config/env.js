@@ -64,11 +64,13 @@ export const env = {
     currency: (process.env.PAYSTACK_CURRENCY || 'USD').toUpperCase(),
     ngnPerUsd: Number(process.env.USD_TO_NGN || 1500),
   },
+  // Brevo's HTTP API. Use this on Railway: Railway blocks SMTP ports on Free/Hobby plans.
+  brevoApiKey: process.env.BREVO_API_KEY,
   smtp: {
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT || 587),
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
-    from: process.env.EMAIL_FROM || 'EmployHunt <no-reply@employhunt.app>',
+    from: process.env.EMAIL_FROM || 'EmployHunt <no-reply@employhunt.work>',
   },
 };

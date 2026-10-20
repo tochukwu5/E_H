@@ -6,12 +6,38 @@ let transport = null;
 const getTransport = () => {
   if (!env.smtp.host) return null;
   if (!transport) {
-    transport = nodemailer.createTransport({ host: env.smtp.host, port: env.smtp.port, secure: env.smtp.port === 465, auth: env.smtp.user ? { user: env.smtp.user, pass: env.smtp.pass } : undefined });
+    transport = nodemailer.createTransport({
+      host: env.smtp.host, port: env.smtp.port, secure: env.smtp.port === 465,
+      auth: env.smtp.user ? { user: env.smtp.user, pass: env.smtp.pass } : undefined,
+      connectionTimeout: 10_000, greetingTimeout: 10_000, socketTimeout: 15_000,
+    });
   }
   return transport;
 };
 
+/** "EmployHunt <hello@site.com>" → { name: 'EmployHunt', email: 'hello@site.com' } */
+function parseFrom(from) {
+  const m = String(from).match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/);
+  return m ? { name: m[1].trim() || 'EmployHunt', email: m[2].trim() } : { name: 'EmployHunt', email: String(from).trim() };
+}
+
+/** Send through Brevo's HTTPS API (port 443), which works on hosts that block SMTP. */
+async function sendViaBrevoApi({ to, subject, html, text }) {
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: { 'api-key': env.brevoApiKey, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ sender: parseFrom(env.smtp.from), to: [{ email: to }], subject, htmlContent: html || undefined, textContent: text || undefined }),
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(`Brevo API ${res.status}: ${body.message || body.code || 'send failed'}`);
+  }
+  return res.json().catch(() => ({}));
+}
+
 export async function sendEmail({ to, subject, html, text }) {
+  if (env.brevoApiKey) return sendViaBrevoApi({ to, subject, html, text });
   const t = getTransport();
   if (!t) {
     logger.info(`[email:dev] to=${to} subject="${subject}"\n${text || html?.replace(/<[^>]+>/g, ' ').slice(0, 600)}`);
