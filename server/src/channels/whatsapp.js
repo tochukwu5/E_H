@@ -25,7 +25,7 @@ export async function sendWhatsAppMatch(phone, { job, match }, link) {
   return send({
     to,
     type: 'template',
-    template: {
+    template: { 
       name: env.whatsapp.template,
       language: { code: env.whatsapp.lang },
       components: [
