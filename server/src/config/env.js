@@ -15,7 +15,11 @@ export const env = {
   adminPassword: process.env.ADMIN_PASSWORD,
 
   fetchCron: process.env.FETCH_CRON || '*/15 * * * *',
-  jobMaxAgeDays: Number(process.env.JOB_MAX_AGE_DAYS || 30),
+  jobMaxAgeDays: Number(process.env.JOB_MAX_AGE_DAYS || 7), // jobs older than this are deleted
+  // Hard cap on stored jobs so the free 512 MB database never fills up. Oldest go first.
+  jobMaxCount: Number(process.env.JOB_MAX_COUNT || 15000),
+  // If the database grows past this many MB, clean up before fetching more jobs.
+  dbSoftLimitMB: Number(process.env.DB_SOFT_LIMIT_MB || 380),
   runScheduler: bool(process.env.RUN_SCHEDULER, true),
   contactEmail: process.env.CONTACT_EMAIL || 'hello@employhunt.app',
   defaultKeywords: list(process.env.DEFAULT_KEYWORDS, ['developer', 'engineer', 'designer', 'marketing']),
@@ -52,6 +56,13 @@ export const env = {
     phoneId: process.env.WHATSAPP_PHONE_NUMBER_ID,
     template: process.env.WHATSAPP_TEMPLATE_NAME || 'job_alert',
     lang: process.env.WHATSAPP_TEMPLATE_LANG || 'en',
+  },
+  paystack: {
+    secret: process.env.PAYSTACK_SECRET_KEY,
+    // USD needs international payments + a USD payout account switched on in Paystack.
+    // Until then you can set PAYSTACK_CURRENCY=NGN: prices still show in dollars and the card is charged the naira equivalent.
+    currency: (process.env.PAYSTACK_CURRENCY || 'USD').toUpperCase(),
+    ngnPerUsd: Number(process.env.USD_TO_NGN || 1500),
   },
   smtp: {
     host: process.env.SMTP_HOST,

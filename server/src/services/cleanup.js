@@ -53,10 +53,27 @@ export async function runCleanup() {
   ]);
   const keep = [...inTracker, ...savedOrApplied];
 
-  const { total: jobs } = await deleteJobsInChunks({
+  const { total: aged } = await deleteJobsInChunks({
     _id: { $nin: keep },
-    $or: [{ active: false }, { postedAt: { $lt: days(env.jobMaxAgeDays) } }, { isDuplicate: true, firstSeenAt: { $lt: days(3) } }],
+    $or: [
+      { active: false },
+      { postedAt: { $lt: days(env.jobMaxAgeDays) } },
+      // Some sources don't give a posting date: use the day we first found the job instead.
+      { postedAt: null, firstSeenAt: { $lt: days(env.jobMaxAgeDays) } },
+      { isDuplicate: true, firstSeenAt: { $lt: days(3) } },
+    ],
   });
+
+  // Hard cap: if there are still too many jobs, remove the oldest ones (never the kept ones).
+  let capped = 0;
+  const count = await Job.estimatedDocumentCount();
+  if (count > env.jobMaxCount) {
+    const cutoff = await Job.find({ _id: { $nin: keep } }).sort({ firstSeenAt: -1 }).skip(env.jobMaxCount).limit(1).select('firstSeenAt').lean();
+    if (cutoff[0]?.firstSeenAt) {
+      ({ total: capped } = await deleteJobsInChunks({ _id: { $nin: keep }, firstSeenAt: { $lte: cutoff[0].firstSeenAt } }));
+    }
+  }
+  const jobs = aged + capped;
 
   const [matches, runs, notes] = await Promise.all([
     Match.deleteMany({ status: { $in: ['new', 'skipped'] }, createdAt: { $lt: days(21) } }),
@@ -67,6 +84,14 @@ export async function runCleanup() {
   const result = { jobs, matches: matches.deletedCount, fetchLogs: runs.deletedCount, notifications: notes.deletedCount, seconds: Math.round((Date.now() - t0) / 1000) };
   logger.info('[cleanup] removed', result);
   return result;
+}
+
+/** Run a cleanup first if the database is getting close to the 512 MB limit. Called before each fetch. */
+export async function cleanupIfLarge() {
+  const { totalMB } = await dbSizeMB();
+  if (totalMB < env.dbSoftLimitMB) return null;
+  logger.warn(`[cleanup] database is ${totalMB} MB (limit ${env.dbSoftLimitMB} MB), cleaning up before fetching`);
+  return runCleanup();
 }
 
 /** Rough database size in MB, for logs and the admin overview. */
