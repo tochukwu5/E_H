@@ -120,3 +120,50 @@
 .live-dot {
   animation: pulse-dot 1.8s ease-in-out infinite;
 }
+
+/* Hero: job icons floating softly in the background */
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-16px) rotate(3deg); }
+}
+.floater {
+  animation: float-soft 8s ease-in-out infinite;
+  opacity: 0.85;
+}
+
+/* Hero: radar pulse behind the alert phone, like EmployHunt scanning for jobs */
+@keyframes radar {
+  0% { transform: translate(-50%, -50%) scale(0.75); opacity: 0.55; }
+  100% { transform: translate(-50%, -50%) scale(1.35); opacity: 0; }
+}
+.radar-ring {
+  animation: radar 3s ease-out infinite;
+}
+
+/* Hero: faint dotted grid that fades out toward the edges */
+.hero-grid {
+  background-image: radial-gradient(rgb(var(--line)) 1px, transparent 1px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(ellipse at 40% 40%, #000 0%, transparent 70%);
+  mask-image: radial-gradient(ellipse at 40% 40%, #000 0%, transparent 70%);
+}
+
+/* Hero: soft light sweeping across one word of the headline */
+@keyframes shine {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.hero-shine {
+  background: linear-gradient(100deg, rgb(var(--brand)) 20%, rgb(var(--match)) 50%, rgb(var(--brand)) 80%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine 5s linear infinite;
+}
+
+/* Hero: the alert feed fades out at the bottom so new alerts can keep arriving */
+.feed-fade {
+  -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent);
+  mask-image: linear-gradient(to bottom, #000 82%, transparent);
+}

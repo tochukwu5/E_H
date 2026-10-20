@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Upload, SlidersHorizontal, BellRing, MousePointerClick, Globe2, Ban, Eye, Moon, Gauge, Filter, PenLine, CalendarClock, Check, MessageCircle, Send } from 'lucide-react';
+import { Upload, SlidersHorizontal, BellRing, MousePointerClick, Globe2, Ban, Eye, Moon, Gauge, Filter, PenLine, CalendarClock, Check, MessageCircle, Send, Briefcase, FileText, Code2, MapPin, BadgeCheck, Building2, Laptop } from 'lucide-react';
 import { get } from '../lib/api';
 import { Button, ScoreRing, Badge } from '../components/ui';
 import PlanGrid from '../components/PlanGrid';
@@ -9,9 +10,12 @@ const SAMPLE_ALERTS = [
   { title: 'Frontend Engineer, Payments', company: 'Ledgerline', place: 'Remote · Worldwide', score: 92, why: 'Uses React, TypeScript and Node. Senior level matches yours.', ago: '4 min after posting' },
   { title: 'Full-stack Developer (MERN)', company: 'Northwind Health', place: 'Remote · EMEA', score: 84, why: 'Title matches "Full stack developer". Missing: Docker.', ago: '11 min after posting' },
   { title: 'Website rebuild, Next.js', company: 'Freelance client', place: 'Remote · $2,000 project', score: 78, why: 'Freelance gig that fits your Next.js work.', ago: '19 min after posting' },
+  { title: 'Product Designer, Mobile', company: 'Brightpath', place: 'Remote · US', score: 88, why: 'Figma and design systems match. Salary above your floor.', ago: '2 min after posting' },
+  { title: 'Backend Engineer, Go', company: 'Cloudmesa', place: 'Berlin · Hybrid', score: 81, why: 'Go and Postgres match. Visa sponsorship offered.', ago: '7 min after posting' },
+  { title: 'Data Analyst', company: 'Harbor Retail', place: 'Remote · UK', score: 86, why: 'SQL and Python match. Mid level matches yours.', ago: '9 min after posting' },
 ];
 
-function AlertBubble({ a, delay }) {
+function AlertBubble({ a, delay = 0 }) {
   return (
     <div className="arrive rounded-[14px] rounded-tl-[4px] border border-line bg-surface p-3.5 shadow-panel" style={{ animationDelay: `${delay}ms` }}>
       <div className="flex gap-3">
@@ -33,46 +37,96 @@ function AlertBubble({ a, delay }) {
   );
 }
 
+/** A new example alert slides in at the top every few seconds, like a live Telegram chat. */
+function LiveFeed() {
+  const [items, setItems] = useState(() => SAMPLE_ALERTS.slice(0, 3).map((a, i) => ({ a, key: i })));
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined;
+    let next = 3;
+    const id = setInterval(() => {
+      if (document.hidden) return;
+      const k = next++;
+      setItems((cur) => [{ a: SAMPLE_ALERTS[k % SAMPLE_ALERTS.length], key: k }, ...cur].slice(0, 3));
+    }, 4200);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div className="feed-fade h-[520px] space-y-3 overflow-hidden px-1 pb-2 pt-4">
+      {items.map(({ a, key }) => <AlertBubble key={key} a={a} delay={key < 3 ? 400 + key * 600 : 0} />)}
+    </div>
+  );
+}
+
+/** Job-themed icons floating softly behind the hero. Purely decorative. */
+const FLOATERS = [
+  [Briefcase, 'left-[2%] top-[8%]', 0, 7],
+  [FileText, 'left-[38%] top-[1%]', 1.2, 8],
+  [Code2, 'left-[52%] top-[34%]', 2.4, 9],
+  [MapPin, 'left-[44%] bottom-[12%]', 0.6, 7.5],
+  [BadgeCheck, 'left-[6%] bottom-[4%]', 1.8, 8.5],
+  [Building2, 'right-[2%] top-[4%]', 3, 9.5],
+  [Laptop, 'right-[4%] bottom-[8%]', 1.4, 8],
+];
+
+function HeroBackdrop() {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div className="hero-grid absolute inset-0" />
+      <div className="absolute right-[8%] top-1/2 h-[520px] w-[520px] -translate-y-1/2 rounded-full bg-brand/10 blur-3xl" />
+      {FLOATERS.map(([Icon, pos, delay, dur], i) => (
+        <span key={i} className={`floater absolute hidden h-11 w-11 place-items-center rounded-[12px] border border-line bg-surface/70 shadow-panel lg:grid ${pos}`} style={{ animationDelay: `${delay}s`, animationDuration: `${dur}s` }}>
+          <Icon className="h-5 w-5 text-brand/70" />
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function Hero() {
   const { data: stats } = useQuery({ queryKey: ['job-stats'], queryFn: () => get('/jobs/stats') });
   return (
-    <section className="page grid items-center gap-12 pb-20 pt-12 lg:grid-cols-[1.1fr_0.9fr] lg:pt-20">
-      <div>
-        {stats?.today > 0 && (
-          <Link to="/jobs?posted=24" className="mb-6 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-[13px] font-semibold text-muted hover:text-ink">
-            <span className="live-dot h-2 w-2 rounded-full bg-match" />
-            <span className="tnum">{stats.today.toLocaleString()}</span> new jobs found in the last 24 hours
-          </Link>
-        )}
-        <h1 className="max-w-[14ch] text-[44px] font-bold leading-[1.02] sm:text-[60px] lg:text-[68px]">Hear about the job before the crowd does.</h1>
-        <p className="mt-6 max-w-[54ch] text-[18px] leading-8 text-muted">
-          EmployHunt checks company career pages and trusted job boards every few minutes, scores each new job against your resume, and sends the good ones to Telegram or email, with WhatsApp coming soon. On Pro, it drafts your application too.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Button to="/register" size="lg">Start free</Button>
-          <Button to="/jobs" size="lg" variant="secondary">Browse live jobs</Button>
+    <section className="relative isolate">
+      <HeroBackdrop />
+      <div className="page grid gap-12 pb-20 pt-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start lg:pt-12">
+        <div className="lg:pt-10">
+          {stats?.today > 0 && (
+            <Link to="/jobs?posted=24" className="arrive mb-6 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-[13px] font-semibold text-muted hover:text-ink">
+              <span className="live-dot h-2 w-2 rounded-full bg-match" />
+              <span className="tnum">{stats.today.toLocaleString()}</span> new jobs found in the last 24 hours
+            </Link>
+          )}
+          <h1 className="arrive max-w-[14ch] text-[44px] font-bold leading-[1.02] sm:text-[60px] lg:text-[68px]" style={{ animationDelay: '80ms' }}>
+            Hear about the job before the <span className="hero-shine">crowd</span> does.
+          </h1>
+          <p className="arrive mt-6 max-w-[54ch] text-[18px] leading-8 text-muted" style={{ animationDelay: '180ms' }}>
+            EmployHunt checks company career pages and trusted job boards every few minutes, scores each new job against your resume, and sends the good ones to Telegram or email, with WhatsApp coming soon. On Pro, it drafts your application too.
+          </p>
+          <div className="arrive mt-8 flex flex-wrap gap-3" style={{ animationDelay: '280ms' }}>
+            <Button to="/register" size="lg">Start free</Button>
+            <Button to="/jobs" size="lg" variant="secondary">Browse live jobs</Button>
+          </div>
+          <ul className="arrive mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[14px] text-muted" style={{ animationDelay: '380ms' }}>
+            {['No credit card for Free', 'Full-time jobs and freelance gigs', 'Works from any country'].map((t) => (
+              <li key={t} className="flex items-center gap-2"><Check className="h-4 w-4 text-match" />{t}</li>
+            ))}
+          </ul>
         </div>
-        <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[14px] text-muted">
-          {['No credit card for Free', 'Full-time jobs and freelance gigs', 'Works from any country'].map((t) => (
-            <li key={t} className="flex items-center gap-2"><Check className="h-4 w-4 text-match" />{t}</li>
-          ))}
-        </ul>
-      </div>
 
-      <div className="relative mx-auto w-full max-w-[400px]">
-        <div className="rounded-[28px] border border-line bg-raised p-3 shadow-pop">
-          <div className="flex items-center gap-3 rounded-[18px] bg-surface px-4 py-3">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-brand text-brand-ink"><Send className="h-4 w-4" /></span>
-            <div>
-              <div className="text-[14px] font-semibold">EmployHunt</div>
-              <div className="flex items-center gap-1.5 text-[12px] text-match"><span className="live-dot h-1.5 w-1.5 rounded-full bg-match" />watching 6 job searches</div>
+        <div className="relative mx-auto w-full max-w-[400px]">
+          <span aria-hidden="true" className="radar-ring absolute left-1/2 top-1/2 -z-10 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-brand/30" />
+          <span aria-hidden="true" className="radar-ring absolute left-1/2 top-1/2 -z-10 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-brand/30" style={{ animationDelay: '1.5s' }} />
+          <div className="rounded-[28px] border border-line bg-raised p-3 shadow-pop">
+            <div className="flex items-center gap-3 rounded-[18px] bg-surface px-4 py-3">
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-brand text-brand-ink"><Send className="h-4 w-4" /></span>
+              <div>
+                <div className="text-[14px] font-semibold">EmployHunt</div>
+                <div className="flex items-center gap-1.5 text-[12px] text-match"><span className="live-dot h-1.5 w-1.5 rounded-full bg-match" />watching 6 job searches</div>
+              </div>
             </div>
+            <LiveFeed />
           </div>
-          <div className="space-y-3 px-1 pb-2 pt-4">
-            {SAMPLE_ALERTS.map((a, i) => <AlertBubble key={a.title} a={a} delay={350 + i * 700} />)}
-          </div>
+          <p className="mt-3 text-center text-[12px] text-faint">Example alerts. Yours are matched to your own resume.</p>
         </div>
-        <p className="mt-3 text-center text-[12px] text-faint">Example alerts. Yours are matched to your own resume.</p>
       </div>
     </section>
   );
