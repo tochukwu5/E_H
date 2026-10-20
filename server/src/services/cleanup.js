@@ -19,6 +19,23 @@ async function slimSearchIndex() {
   await Job.createIndexes();
 }
 
+/**
+ * After deleting lots of jobs, MongoDB keeps the old index space reserved, so indexes can end up
+ * far bigger than the data. Rebuilding them gives that space back. Only runs when indexes are bloated.
+ */
+async function rebuildBloatedIndexes() {
+  const s = await Job.db.db.stats();
+  const dataMB = s.dataSize / 1048576;
+  const indexMB = s.indexSize / 1048576;
+  if (indexMB < 60 || indexMB < dataMB * 1.5) return false;
+  logger.warn(`[cleanup] indexes are ${Math.round(indexMB)} MB for ${Math.round(dataMB)} MB of data, rebuilding them`);
+  await Job.collection.dropIndexes(); // keeps the built-in _id index
+  await Job.createIndexes();
+  const after = await Job.db.db.stats();
+  logger.info(`[cleanup] indexes rebuilt: ${Math.round(indexMB)} MB → ${Math.round(after.indexSize / 1048576)} MB`);
+  return true;
+}
+
 /** Delete in chunks so a large first cleanup never sends one huge query. */
 async function deleteJobsInChunks(filter) {
   let total = 0;
@@ -81,7 +98,9 @@ export async function runCleanup() {
     Notification.deleteMany({ createdAt: { $lt: days(30) } }),
   ]);
 
-  const result = { jobs, matches: matches.deletedCount, fetchLogs: runs.deletedCount, notifications: notes.deletedCount, seconds: Math.round((Date.now() - t0) / 1000) };
+  const rebuilt = await rebuildBloatedIndexes().catch((e) => logger.warn(`[cleanup] index rebuild: ${e.message}`));
+
+  const result = { jobs, indexesRebuilt: Boolean(rebuilt), matches: matches.deletedCount, fetchLogs: runs.deletedCount, notifications: notes.deletedCount, seconds: Math.round((Date.now() - t0) / 1000) };
   logger.info('[cleanup] removed', result);
   return result;
 }
