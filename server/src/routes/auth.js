@@ -93,7 +93,9 @@ r.post(
         subject: 'Reset your EmployHunt password',
         html: layout('Reset your password', `<p>Tap the button to choose a new password. The link works for one hour.</p><p><a href="${link}" style="background:#2747d6;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600">Choose a new password</a></p><p style="font-size:13px;color:#6b7690">Didn't ask for this? You can ignore this email.</p>`),
         text: `Reset your password: ${link}`,
-      }).catch((e) => logger.error(`[email] password reset to ${user.email} failed: ${e.message}`));
+        })
+        .then(() => logger.info(`[email] password reset sent to ${user.email}`))
+        .catch((e) => logger.error(`[email] password reset to ${user.email} failed: ${e.message}`));
     }
     // Same answer either way so nobody can test which emails have accounts.
     res.json({ ok: true, message: 'If that email has an account, a reset link is on its way.' });
